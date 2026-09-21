@@ -13,24 +13,36 @@ pygame.init()
 WIDTH = 800
 HEIGHT = 700
 
+
 screen = pygame.display.set_mode(
     (WIDTH, HEIGHT)
 )
+
 
 pygame.display.set_caption(
     "一箭又一箭"
 )
 
 
+# ======================
 # 颜色
+# ======================
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
+
 BLUE = (50,120,255)
+
 RED = (255,80,80)
+
 GREEN = (50,200,100)
+
 GRAY = (220,220,220)
 
+
+# ======================
+# 字体
+# ======================
 
 font = pygame.font.SysFont(
     "SimHei",
@@ -47,6 +59,30 @@ big_font = pygame.font.SysFont(
 clock = pygame.time.Clock()
 
 
+
+# ======================
+# 按钮
+# ======================
+
+
+restart_button = pygame.Rect(
+    600,
+    50,
+    120,
+    50
+)
+
+
+undo_button = pygame.Rect(
+    600,
+    100,
+    120,
+    50
+)
+
+
+
+
 # ======================
 # 关卡设计
 # ======================
@@ -54,27 +90,33 @@ clock = pygame.time.Clock()
 
 levels = [
 
+
 [
-["R","R","U"],
-[None,None,"D"],
-["L",None,None]
+    ["R","R","U"],
+    [None,None,"D"],
+    ["L",None,None]
 ],
 
 
+
 [
-["R",None,"R"],
-["D","U","R"],
-[None,None,"D"]
+    ["R",None,"R"],
+    ["D","U","R"],
+    [None,None,"D"]
 ],
 
 
+
 [
-["R","R","R"],
-["U","D","L"],
-["L","D","D"]
+    ["R","R","R"],
+    ["U","D","L"],
+    ["L","D","D"]
 ]
 
+
 ]
+
+
 
 
 # ======================
@@ -84,19 +126,69 @@ levels = [
 
 level_index = 0
 
+
 mistakes = 5
 
 
 arrows = []
 
 
+history = []
+
+
 state = "start"
+
 
 
 shake = {}
 
 
+
+
 # ======================
+# 撤销功能
+# ======================
+
+
+def save_state():
+
+    state = {
+
+        "alive":
+        [
+            a.alive
+            for a in arrows
+        ],
+
+        "mistakes":
+        mistakes
+
+    }
+
+
+    history.append(state)
+
+
+
+
+def undo():
+
+    global mistakes
+
+
+    if len(history)>0:
+
+
+        state = history.pop()
+
+
+        for i,a in enumerate(arrows):
+
+            a.alive = state["alive"][i]
+
+
+        mistakes = state["mistakes"]
+        # ======================
 # 箭头对象
 # ======================
 
@@ -111,67 +203,103 @@ class Arrow:
         direction
     ):
 
-        self.row=row
-        self.col=col
-        self.direction=direction
 
-        self.x=250+col*100
-        self.y=180+row*100
+        self.row = row
 
-        self.alive=True
+        self.col = col
 
-        self.offset=0
+        self.direction = direction
 
-        self.color=BLUE
+
+        self.x = 250 + col * 100
+
+        self.y = 180 + row * 100
+
+
+        self.alive = True
+
+
+        self.offset = 0
+
+
+        self.color = BLUE
+
 
 
 
     def draw(self):
 
+
         if not self.alive:
+
             return
 
 
-        x=self.x+self.offset
+
+        x = self.x + self.offset
+
 
 
         pygame.draw.rect(
+
             screen,
+
             GRAY,
+
             (
                 self.x,
                 self.y,
                 80,
                 80
             )
+
         )
 
 
-        text=font.render(
+
+        text = font.render(
+
             self.symbol(),
+
             True,
+
             self.color
+
         )
+
+
 
         screen.blit(
+
             text,
+
             (
                 x+20,
                 self.y+20
             )
+
         )
+
+
+
 
 
     def symbol(self):
 
+
         return {
 
             "U":"↑",
+
             "D":"↓",
+
             "L":"←",
+
             "R":"→"
 
         }[self.direction]
+
+
 
 
 
@@ -182,31 +310,52 @@ class Arrow:
 
 def load_level():
 
+
     global arrows
+
     global mistakes
 
 
-    arrows=[]
 
-    mistakes=5
+    arrows = []
 
 
-    data=levels[level_index]
+    mistakes = 5
+
+
+
+    history.clear()
+
+
+
+    data = levels[level_index]
+
 
 
     for r,row in enumerate(data):
 
+
         for c,value in enumerate(row):
+
 
             if value:
 
+
                 arrows.append(
+
                     Arrow(
+
                         r,
+
                         c,
+
                         value
+
                     )
+
                 )
+
+
 
 
 
@@ -221,55 +370,84 @@ def blocked(target):
     for a in arrows:
 
 
-        if a==target or not a.alive:
+        if a == target or not a.alive:
+
             continue
+
 
 
         # 向右
 
-        if target.direction=="R":
+        if target.direction == "R":
+
 
             if (
-                a.row==target.row
-                and a.col>target.col
+
+                a.row == target.row
+
+                and a.col > target.col
+
             ):
+
                 return True
+
+
 
 
 
         # 向左
 
-        if target.direction=="L":
+        if target.direction == "L":
+
 
             if (
-                a.row==target.row
-                and a.col<target.col
+
+                a.row == target.row
+
+                and a.col < target.col
+
             ):
+
                 return True
+
+
 
 
 
         # 向上
 
-        if target.direction=="U":
+        if target.direction == "U":
+
 
             if (
-                a.col==target.col
-                and a.row<target.row
+
+                a.col == target.col
+
+                and a.row < target.row
+
             ):
+
                 return True
+
+
 
 
 
         # 向下
 
-        if target.direction=="D":
+        if target.direction == "D":
+
 
             if (
-                a.col==target.col
-                and a.row>target.row
+
+                a.col == target.col
+
+                and a.row > target.row
+
             ):
+
                 return True
+
 
 
 
@@ -277,51 +455,78 @@ def blocked(target):
 
 
 
+
+
 # ======================
-# 点击检测
+# 点击箭头
 # ======================
 
-# 箭头移动检测
-# 判断箭头同方向上的棋盘位置
-# 如果存在其他箭头，则产生碰撞反馈
+
 def click_arrow(pos):
 
+
     global mistakes
+
 
 
     for a in arrows:
 
 
         if not a.alive:
+
             continue
 
 
-        rect=pygame.Rect(
+
+        rect = pygame.Rect(
+
             a.x,
+
             a.y,
+
             80,
+
             80
+
         )
+
 
 
         if rect.collidepoint(pos):
 
 
+
             if blocked(a):
 
-                mistakes-=1
 
-                a.color=RED
-
-                a.offset=15
+                mistakes -= 1
 
 
-                shake[a]=10
+                a.color = RED
+
+
+                a.offset = 15
+
+
+                shake[a] = 10
+
+
 
 
             else:
 
-                a.alive=False
+
+                save_state()
+
+
+                a.alive = False
+
+
+
+            break
+
+
+
 
 
 
@@ -336,24 +541,79 @@ def update_animation():
     for a in list(shake):
 
 
-        if shake[a]>0:
+        if shake[a] > 0:
 
-            a.offset*=-1
 
-            shake[a]-=1
+            a.offset *= -1
+
+
+            shake[a] -= 1
+
 
 
         else:
 
-            a.offset=0
-            a.color=BLUE
+
+            a.offset = 0
+
+
+            a.color = BLUE
+
 
             del shake[a]
+            # ======================
+# 绘制按钮
+# ======================
+
+
+def draw_button(
+    rect,
+    text,
+    color
+):
+
+
+    pygame.draw.rect(
+
+        screen,
+
+        color,
+
+        rect,
+
+        border_radius=10
+
+    )
+
+
+    t = font.render(
+
+        text,
+
+        True,
+
+        WHITE
+
+    )
+
+
+    screen.blit(
+
+        t,
+
+        (
+            rect.x+20,
+            rect.y+10
+        )
+
+    )
+
+
 
 
 
 # ======================
-# 绘制界面
+# 绘制游戏界面
 # ======================
 
 
@@ -363,9 +623,12 @@ def draw_game():
     screen.fill(WHITE)
 
 
-    title=font.render(
 
-        f"第 {level_index+1} 关",
+    # 标题
+
+    title = big_font.render(
+
+        "一箭又一箭",
 
         True,
 
@@ -375,14 +638,37 @@ def draw_game():
 
 
     screen.blit(
+
         title,
-        (30,30)
+
+        (250,20)
+
     )
 
 
-    info=font.render(
 
-        f"剩余箭头:{sum(a.alive for a in arrows)}   失误:{mistakes}",
+    # 信息
+
+
+    info = font.render(
+
+        "第{}关   剩余箭头:{}   失误:{}".
+
+        format(
+
+            level_index+1,
+
+            sum(
+
+                1 for a in arrows
+
+                if a.alive
+
+            ),
+
+            mistakes
+
+        ),
 
         True,
 
@@ -392,9 +678,16 @@ def draw_game():
 
 
     screen.blit(
+
         info,
-        (30,80)
+
+        (30,120)
+
     )
+
+
+
+    # 箭头
 
 
     for a in arrows:
@@ -403,132 +696,174 @@ def draw_game():
 
 
 
-    pygame.draw.rect(
-
-        screen,
-
-        GREEN,
-
-        (600,50,120,50)
-
-    )
+    # 按钮
 
 
-    screen.blit(
+    draw_button(
 
-        font.render(
-            "重新开始",
-            True,
-            BLACK
-        ),
+        restart_button,
 
-        (610,60)
+        "重新开始",
+
+        GREEN
 
     )
 
 
+    draw_button(
+
+        undo_button,
+
+        "撤销",
+
+        BLUE
+
+    )
+
+
+
+
 
 # ======================
-# 开始界面
+# 通关检查
 # ======================
+
+
+def check_win():
+
+
+    global level_index
+
+    global state
+
+
+
+    if all(
+
+        not a.alive
+
+        for a in arrows
+
+    ):
+
+
+        level_index += 1
+
+
+
+        if level_index >= len(levels):
+
+
+            state = "win"
+
+
+        else:
+
+
+            load_level()
+
+
+
+
 
 
 def draw_start():
 
+
     screen.fill(WHITE)
 
 
-    t=big_font.render(
+
+    title = big_font.render(
 
         "一箭又一箭",
 
         True,
 
-        BLUE
-
-    )
-
-
-    screen.blit(
-        t,
-        (250,200)
-    )
-
-
-    pygame.draw.rect(
-
-        screen,
-
-        GREEN,
-
-        (300,350,200,70)
+        BLACK
 
     )
 
 
     screen.blit(
 
-        font.render(
-            "开始游戏",
-            True,
-            BLACK
-        ),
+        title,
 
-        (330,370)
+        (220,200)
 
     )
 
 
 
-# ======================
-# 结束界面
-# ======================
+    tip = font.render(
+
+        "点击开始游戏",
+
+        True,
+
+        BLACK
+
+    )
 
 
-def draw_end(win):
+    screen.blit(
+
+        tip,
+
+        (280,300)
+
+    )
+
+
+
+
+
+def draw_end(text):
 
 
     screen.fill(WHITE)
 
 
-    if win:
-
-        text="通关成功"
-
-    else:
-
-        text="挑战失败"
-
-
-
-    t=big_font.render(
+    t = big_font.render(
 
         text,
 
         True,
 
-        BLUE
+        BLACK
 
     )
 
 
     screen.blit(
+
         t,
-        (270,250)
+
+        (220,250)
+
+    )
+
+
+    tip = font.render(
+
+        "点击重新开始",
+
+        True,
+
+        BLACK
+
     )
 
 
     screen.blit(
 
-        font.render(
-            "点击重新开始",
-            True,
-            BLACK
-        ),
+        tip,
 
-        (270,350)
+        (280,330)
 
     )
+
+
 
 
 
@@ -537,103 +872,128 @@ def draw_end(win):
 # ======================
 
 
-load_level()
+running = True
 
 
-while True:
+
+while running:
+
 
 
     for event in pygame.event.get():
 
 
-        if event.type==pygame.QUIT:
+        if event.type == pygame.QUIT:
 
-            pygame.quit()
-
-            sys.exit()
+            running = False
 
 
 
-        if event.type==pygame.MOUSEBUTTONDOWN:
-
-
-            pos=pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEBUTTONDOWN:
 
 
 
-            if state=="start":
-
-                state="game"
+            pos = pygame.mouse.get_pos()
 
 
 
-            elif state=="game":
+            # 开始界面
+
+            if state == "start":
 
 
-                if (
-                    600<pos[0]<720
-                    and 50<pos[1]<100
-                ):
+                state = "game"
 
-                    load_level()
-
-
-                else:
-
-                    click_arrow(pos)
-
-
-
-    if state=="start":
-
-        draw_start()
-
-
-    elif state=="game":
-
-
-        update_animation()
-
-
-        draw_game()
-
-
-        if mistakes<=0:
-
-            state="fail"
-
-
-
-        if all(
-            not a.alive
-            for a in arrows
-        ):
-
-            level_index+=1
-
-
-            if level_index>=len(levels):
-
-                state="win"
-
-            else:
 
                 load_level()
 
 
 
-    elif state=="win":
+            # 游戏
 
-        draw_end(True)
+            elif state == "game":
 
 
-    elif state=="fail":
 
-        draw_end(False)
+                if restart_button.collidepoint(pos):
+
+
+                    load_level()
+
+
+
+                elif undo_button.collidepoint(pos):
+
+
+                    undo()
+
+
+
+                else:
+
+
+                    click_arrow(pos)
+
+
+
+            # 结束
+
+            elif state == "win":
+
+
+                level_index = 0
+
+
+                state = "game"
+
+
+                load_level()
+
+
+
+
+
+    update_animation()
+
+
+
+    if state == "game":
+
+
+        check_win()
+
+
+        draw_game()
+
+
+
+    elif state == "start":
+
+
+        draw_start()
+
+
+
+    elif state == "win":
+
+
+        draw_end(
+
+            "恭喜通关!"
+
+        )
 
 
 
     pygame.display.update()
 
 
+
     clock.tick(60)
+
+
+
+
+pygame.quit()
+
+sys.exit()
