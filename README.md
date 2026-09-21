@@ -42,6 +42,8 @@
 - 重新开始功能
 ## 游戏截图
 
+# 一箭又一箭小游戏
+
 ## 开始界面
 
 ![开始界面](screenshots/screenshotsstart.png)
