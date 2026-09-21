@@ -281,7 +281,9 @@ def blocked(target):
 # 点击检测
 # ======================
 
-
+# 箭头移动检测
+# 判断箭头同方向上的棋盘位置
+# 如果存在其他箭头，则产生碰撞反馈
 def click_arrow(pos):
 
     global mistakes
