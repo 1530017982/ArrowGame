@@ -40,3 +40,18 @@
 - 碰撞反馈
 - 三个游戏关卡
 - 重新开始功能
+## 游戏截图
+
+# 一箭又一箭小游戏
+
+## 开始界面
+![开始界面](screenshots/start.png)
+
+## 游戏界面
+![游戏界面](screenshots/game.png)
+
+## 通关界面
+![通关界面](screenshots/win.png)
+
+## 失败界面
+![失败界面](screenshots/restart.png)
