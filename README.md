@@ -40,3 +40,23 @@
 - 碰撞反馈
 - 三个游戏关卡
 - 重新开始功能
+## 游戏截图
+
+### 开始界面
+
+![开始界面](screenshots/screenshotstart.png)
+
+
+### 游戏界面
+
+![游戏界面](screenshots/screenshotsgame.png)
+
+
+### 通关界面
+
+![通关](screenshots/screenshotswin.png)
+
+
+### 失败界面
+
+![失败](screenshots/screenshotsrestart.png)
